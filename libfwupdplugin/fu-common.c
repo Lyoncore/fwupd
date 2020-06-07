@@ -1125,6 +1125,10 @@ fu_common_get_path (FuPathKind path_kind)
 		return g_strdup ("/system-update");
 	case FU_PATH_KIND_POLKIT_ACTIONS:
 #ifdef POLKIT_ACTIONDIR
+		/* check if fwupd is run with snap */
+		tmp = g_getenv ("SNAP");
+		if (tmp != NULL)
+			return g_build_filename (tmp, "share/polkit-1/actions/", NULL);
 		return g_strdup (POLKIT_ACTIONDIR);
 #else
 	return NULL;
