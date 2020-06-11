@@ -23,6 +23,7 @@
 #include "fwupd-release-private.h"
 #include "fwupd-remote-private.h"
 #include "fwupd-resources.h"
+#include "fwupd-common.h"
 
 #include "fu-common.h"
 #include "fu-debug.h"
@@ -567,6 +568,9 @@ static void fu_main_authorize_install_queue (FuMainAuthHelper *helper);
 static void
 fu_main_authorize_install_cb (GObject *source, GAsyncResult *res, gpointer user_data)
 {
+	const gchar *os_release_id = NULL;
+	g_autoptr(GError) error_local = NULL;
+	g_autoptr(GHashTable) os_release = fwupd_get_os_release (&error_local);
 	g_autoptr(FuMainAuthHelper) helper = (FuMainAuthHelper *) user_data;
 	g_autoptr(GError) error = NULL;
 	g_autoptr(PolkitAuthorizationResult) auth = NULL;
@@ -575,11 +579,27 @@ fu_main_authorize_install_cb (GObject *source, GAsyncResult *res, gpointer user_
 	fu_main_set_status (helper->priv, FWUPD_STATUS_IDLE);
 	auth = polkit_authority_check_authorization_finish (POLKIT_AUTHORITY (source),
 							    res, &error);
+	/* TODO: workaround polkit when system is ubuntu-core */
+	/* try to lookup /etc/os-release ID key */
+	if (os_release != NULL) {
+		os_release_id = g_hash_table_lookup (os_release, "ID");
+	} else {
+		g_debug ("failed to get ID: %s", error_local->message);
+	}
+	if (os_release_id == NULL)
+		os_release_id = "unknown";
+
+	/* don't check authorization via polkit if ID is ubuntu-core */
+	if (g_strcmp0(os_release_id, "ubuntu-core") == 0) {
+		goto out;
+	}
+
 	if (!fu_main_authorization_is_valid (auth, &error)) {
 		g_dbus_method_invocation_return_gerror (helper->invocation, error);
 		return;
 	}
 
+out:
 	/* do the next authentication action ID */
 	fu_main_authorize_install_queue (g_steal_pointer (&helper));
 }
