@@ -22,7 +22,8 @@
 #endif
 
 #define SYSTEMD_FWUPD_UNIT		"fwupd.service"
-#define SYSTEMD_SNAP_FWUPD_UNIT		"snap.fwupd.fwupd.service"
+#define SYSTEMD_SNAP_FWUPD_UNIT		"snap.uefi-fw-tools.fwupd.service"
+#define SNAP_FWUPDMGR_UNIT		"uefi-fw-tools.fwupdmgr"
 
 const gchar *
 fu_util_get_systemd_unit (void)
@@ -37,7 +38,7 @@ static const gchar *
 fu_util_get_expected_command (const gchar *target)
 {
 	if (g_strcmp0 (target, SYSTEMD_SNAP_FWUPD_UNIT) == 0)
-		return "fwupd.fwupdmgr";
+		return SNAP_FWUPDMGR_UNIT;
 	return "fwupdmgr";
 }
 #endif
