@@ -237,7 +237,7 @@ fu_uefi_get_esp_path_for_os (const gchar *base)
 		os_release_id = "unknown";
 	/* special case: try to identify if ID is ubuntu-core */
 	if (g_strcmp0(os_release_id, "ubuntu-core") == 0) {
-		esp_path = g_build_filename (base, "EFI", "ubuntu", NULL);
+		esp_path = g_build_filename (base, "EFI", "boot", NULL);
 	}
 	else {
 		/* if ID key points at something existing return it */
