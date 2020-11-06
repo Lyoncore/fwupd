@@ -1995,3 +1995,12 @@ fu_util_switch_branch_warning (FwupdDevice *dev,
 	}
 	return TRUE;
 }
+
+void
+fu_util_show_daemon_warning (const gchar *msg)
+{
+	g_autofree gchar *fmt = NULL;
+	/* TRANSLATORS: this is a prefix on the console */
+	fmt = fu_util_term_format (_("WARNING:"), FU_UTIL_TERM_COLOR_RED);
+	g_printerr ("%s %s\n", fmt, msg);
+}

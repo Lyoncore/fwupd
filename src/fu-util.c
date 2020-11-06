@@ -2707,6 +2707,7 @@ main (int argc, char *argv[])
 	g_autoptr(GPtrArray) cmd_array = fu_util_cmd_array_new ();
 	g_autofree gchar *cmd_descriptions = NULL;
 	g_autofree gchar *filter = NULL;
+	const gchar *msg;
 	const GOptionEntry options[] = {
 		{ "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose,
 			/* TRANSLATORS: command line option */
@@ -3009,13 +3010,11 @@ main (int argc, char *argv[])
 
 	/* allow disabling SSL strict mode for broken corporate proxies */
 	if (priv->disable_ssl_strict) {
-		g_autofree gchar *fmt = NULL;
-		/* TRANSLATORS: this is a prefix on the console */
-		fmt = fu_util_term_format (_("WARNING:"), FU_UTIL_TERM_COLOR_RED);
 		/* TRANSLATORS: try to help */
-		g_printerr ("%s %s\n", fmt, _("Ignoring SSL strict checks, "
-					      "to do this automatically in the future "
-					      "export DISABLE_SSL_STRICT in your environment"));
+		msg = _("Ignoring SSL strict checks, "
+			"to do this automatically in the future "
+			"export DISABLE_SSL_STRICT in your environment");
+		fu_util_show_daemon_warning (msg);
 		g_setenv ("DISABLE_SSL_STRICT", "1", TRUE);
 	}
 
@@ -3107,15 +3106,16 @@ main (int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 	if (fwupd_client_get_tainted (priv->client)) {
-		g_autofree gchar *fmt = NULL;
-		/* TRANSLATORS: this is a prefix on the console */
-		fmt = fu_util_term_format (_("WARNING:"), FU_UTIL_TERM_COLOR_RED);
-		g_printerr ("%s %s\n",
-			    fmt,
-			    /* TRANSLATORS: the user is SOL for support... */
-			    _("The daemon has loaded 3rd party code and "
-			      "is no longer supported by the upstream developers!"));
+		/* TRANSLATORS: the user is SOL for support... */
+		msg =  _("The daemon has loaded 3rd party code and "
+			"is no longer supported by the upstream developers!");
+		fu_util_show_daemon_warning (msg);
 	}
+#ifndef SUPPORTED_BUILD
+	/* TRANSLATORS: the user is SOL for support... */
+	msg = _("This is not a distribution validated package, it is only best effort support");
+	fu_util_show_daemon_warning (msg);
+#endif
 
 	/* show user-visible warnings from the plugins */
 	fu_util_show_plugin_warnings (priv);

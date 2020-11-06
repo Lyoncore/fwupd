@@ -169,6 +169,7 @@ static gboolean
 fu_util_start_engine (FuUtilPrivate *priv, FuEngineLoadFlags flags, GError **error)
 {
 	g_autoptr(GError) error_local = NULL;
+	const gchar *msg;
 
 #ifdef HAVE_SYSTEMD
 	if (!fu_systemd_unit_stop (fu_util_get_systemd_unit (), &error_local))
@@ -177,14 +178,17 @@ fu_util_start_engine (FuUtilPrivate *priv, FuEngineLoadFlags flags, GError **err
 	if (!fu_engine_load (priv->engine, flags, error))
 		return FALSE;
 	if (fu_engine_get_tainted (priv->engine)) {
-		g_autofree gchar *fmt = NULL;
-
-		/* TRANSLATORS: this is a prefix on the console */
-		fmt = fu_util_term_format (_("WARNING:"), FU_UTIL_TERM_COLOR_RED);
-		g_printerr ("%s This tool has loaded 3rd party code and "
-			    "is no longer supported by the upstream developers!\n",
-			    fmt);
+		/* TRANSLATORS: the user is SOL for support... */
+		msg =  _("The daemon has loaded 3rd party code and "
+			"is no longer supported by the upstream developers!");
+		fu_util_show_daemon_warning (msg);
 	}
+#ifndef SUPPORTED_BUILD
+	/* TRANSLATORS: the user is SOL for support... */
+	msg = _("This is not a distribution validated package, it is only best effort support");
+	fu_util_show_daemon_warning (msg);
+#endif
+
 	fu_util_show_plugin_warnings (priv);
 	return TRUE;
 }
