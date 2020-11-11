@@ -273,7 +273,8 @@ fu_uefi_bootmgr_bootnext (const gchar *esp_path,
 	secure_boot = fu_efivar_secure_boot_enabled ();
 	if (secure_boot) {
 		/* test to make sure shim is there if we need it */
-		shim_app = fu_uefi_get_esp_app_path (esp_path, "shim", error);
+		/* ubuntu core: the shim is located at /EFI/boot/bootx64.efi */
+		shim_app = fu_uefi_get_esp_app_path (esp_path, "boot", error);
 		if (shim_app == NULL)
 			return FALSE;
 
