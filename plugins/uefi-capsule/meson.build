@@ -38,6 +38,7 @@ shared_module('fu_plugin_uefi_capsule',
   c_args : cargs,
   dependencies : [
     plugin_deps,
+    efivar,
     efiboot,
     tpm2tss,
   ],
@@ -65,6 +66,7 @@ fwupdate = executable(
   ],
   dependencies : [
     plugin_deps,
+    efivar,
     efiboot,
     tpm2tss,
   ],
@@ -150,6 +152,7 @@ if get_option('tests')
     ],
     dependencies : [
       plugin_deps,
+      efivar,
       efiboot,
       tpm2tss,
     ],
