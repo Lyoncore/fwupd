@@ -350,6 +350,7 @@ if build_standalone and get_option('plugin_uefi_capsule')
   fontconfig = cc.find_library('fontconfig')
   freetype = cc.find_library('freetype')
   efiboot = dependency('efiboot')
+  efivar = dependency('efivar')
   objcopy = find_program ('objcopy')
   genpeimg = find_program ('genpeimg', required: false)
 
